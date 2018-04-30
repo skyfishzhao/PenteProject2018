@@ -1,11 +1,13 @@
 package pentePac2018;
 
 import java.awt.Color;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class PenteGame extends JPanel
+public class PenteGame extends JPanel implements MouseListener 
 {
   
         public static final int SQUARES_ON_SIDE = 19;  //literal
@@ -20,6 +22,8 @@ public class PenteGame extends JPanel
         //Two new variables....for frame awesomeness...
         private JFrame myFrame;
         private int frameBorder;
+        //I'm adding this for turns
+        private int whoseTurn = RED;
         
         // make and instance -- instantiate
        
@@ -77,7 +81,7 @@ public class PenteGame extends JPanel
                          yStart += squareLength;
                          // this is to test square states
                         
-                           board[r][c].setState(this.RED);
+                           //board[r][c].setState(this.RED);
                         
                       }
                       
@@ -86,7 +90,8 @@ public class PenteGame extends JPanel
               }
               
               
-         
+              this.addMouseListener(this);
+              
            
 
               
@@ -114,6 +119,78 @@ public class PenteGame extends JPanel
            
          
        }
+
+
+      public void mouseClicked(MouseEvent e)
+      {
+        // TODO Auto-generated method stub
+        
+      }
+
+
+      public void mousePressed(MouseEvent e)
+      {
+        // TODO Auto-generated method stub
+        
+            //System.out.println("Hi -- I can't talk either because I have no voice");
+            
+            System.out.println("You clicked at " + e.getX() + ", " + e.getY() );
+            
+            
+            this.checkClick(e.getX(), e.getY() );
+        
+      }
+      
+      public void checkClick(int mouseX, int mouseY){
+        Square ClickedSquare;   //temporary square that holds a link to where you clicked
+        for(int r = 0; r < SQUARES_ON_SIDE; r++)
+        {
+                for(int c = 0; c < SQUARES_ON_SIDE; c++)
+                {
+                      if(board[r][c].thisSquareClicked(mouseX, mouseY)  == true){
+                        ClickedSquare = board[r][c];
+                        
+                        System.out.println("you clicked on Square " + r + ", " + c);
+                     
+                        if(ClickedSquare.getState()==EMPTY){
+                            ClickedSquare.setState(whoseTurn);
+                            this.changeTurn();
+                            this.repaint();
+                        } else {
+                           javax.swing.JOptionPane.showMessageDialog(null, "YOU CAN'T CLICK HERE");
+                        }
+                        
+                      }
+                }  
+        }
+        
+        
+      }
+      
+      public void changeTurn(){
+        whoseTurn *= -1;
+      }
+
+
+      public void mouseReleased(MouseEvent e)
+      {
+        // TODO Auto-generated method stub
+        
+      }
+
+
+      public void mouseEntered(MouseEvent e)
+      {
+        // TODO Auto-generated method stub
+        
+      }
+
+
+      public void mouseExited(MouseEvent e)
+      {
+        // TODO Auto-generated method stub
+        
+      }
         
         
         

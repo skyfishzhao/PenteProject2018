@@ -12,8 +12,18 @@ public class Square
       private int squareState;
      
       private Color bColor = new Color(253, 247, 201);
+      
       private Color redStoneColor = new Color(219, 28, 95);
+      private Color redDarkStoneColor = new Color(175, 8, 86);
+      private Color redLightStoneColor = new Color(247, 46, 93);
+      
       private Color goldStoneColor = new Color(224, 206, 87);
+     // private Color goldDarkStoneColor = new Color(165, 141, 33);
+      private Color goldDarkStoneColor = new Color(165, 160, 33);
+      private Color goldLightStoneColor = new Color(249, 222, 14);
+      
+      
+      
       private Color stoneShadowColor = new Color(132, 132, 116);
       
       
@@ -34,6 +44,18 @@ public class Square
             //Draw background Square
             g.fillRect(xLoc, yLoc, sideLength, sideLength);
             
+          
+            if(squareState!= PenteGame.EMPTY)
+            {
+                  g.setColor(stoneShadowColor);
+                  g.fillOval (
+                      xLoc + (int)(sideLength * 0.1 +2),
+                      yLoc + (int)(sideLength * 0.1 +2 ),
+                      (int)(sideLength * 0.8),
+                      (int)(sideLength * 0.8 )
+                      );
+                    
+            }
            
           
             // line for placing stone
@@ -68,6 +90,50 @@ public class Square
             }
             
             
+            if(squareState == PenteGame.RED)
+            {
+              
+                  g.setColor(redDarkStoneColor); 
+                  g.fillOval (
+                      xLoc + (int)(sideLength * 0.1),
+                      yLoc + (int)(sideLength * 0.1),
+                      (int)(sideLength * 0.8),
+                      (int)(sideLength * 0.8 )
+                      );
+              
+                  g.setColor(redLightStoneColor); 
+                  
+                  g.fillOval (
+                      xLoc + (int)(sideLength * 0.1),
+                      yLoc + (int)(sideLength * 0.1),
+                      (int)(sideLength * 0.8-3),
+                      (int)(sideLength * 0.8  -3 )
+                      );
+            }
+            
+            
+            if(squareState == PenteGame.GOLD)
+            {
+              
+                  g.setColor(goldDarkStoneColor); 
+                  g.fillOval (
+                      xLoc + (int)(sideLength * 0.1),
+                      yLoc + (int)(sideLength * 0.1),
+                      (int)(sideLength * 0.8),
+                      (int)(sideLength * 0.8 )
+                      );
+              
+                  g.setColor(goldLightStoneColor); 
+                  
+                  g.fillOval (
+                      xLoc + (int)(sideLength * 0.1),
+                      yLoc + (int)(sideLength * 0.1),
+                      (int)(sideLength * 0.8-3),
+                      (int)(sideLength * 0.8  -3 )
+                      );
+            }
+            
+            
             
         
       }
@@ -83,6 +149,19 @@ public class Square
       public int getState()
       {
           return squareState;
+      }
+      
+      public boolean thisSquareClicked(int checkX, int checkY)
+      {
+        //This gives each square an ability to check to see if it was clicked.
+          boolean gotClicked = false;
+          
+          if( checkX >= xLoc &&  checkX < xLoc + sideLength)
+            if( checkY >= yLoc &&  checkY < yLoc + sideLength)
+              gotClicked = true;
+          
+          
+          return gotClicked;
       }
       
       
