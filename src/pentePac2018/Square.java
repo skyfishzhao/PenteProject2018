@@ -45,6 +45,7 @@ public class Square
             g.fillRect(xLoc, yLoc, sideLength, sideLength);
             
           
+            //if there is a stone draw a shadow
             if(squareState!= PenteGame.EMPTY)
             {
                   g.setColor(stoneShadowColor);
@@ -68,15 +69,6 @@ public class Square
            // g.setColor(Color.WHITE);
            // g.drawRect(xLoc, yLoc, sideLength, sideLength);
           
-           
-            
-            if(squareState == PenteGame.GOLD)
-                g.setColor(goldStoneColor);
-            
-          
-            
-            if(squareState == PenteGame.RED)
-                 g.setColor(redStoneColor);
             
             
             if(squareState != PenteGame.EMPTY)
