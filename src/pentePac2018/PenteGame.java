@@ -25,6 +25,10 @@ public class PenteGame extends JPanel implements MouseListener
         //I'm adding this for turns
         private int whoseTurn = RED;
         
+        //We need variables to remember captures
+        private int redCaptures = 0;
+        private int goldCaptures = 0;
+        
         // make and instance -- instantiate
        
         //Declaration...
@@ -72,10 +76,10 @@ public class PenteGame extends JPanel implements MouseListener
               int yStart = frameBorder;
               
               // These loops generate all the squares.
-              for(int r = 0; r < SQUARES_ON_SIDE; r++)
+              for(int c = 0; c < SQUARES_ON_SIDE; c++)
               {
                      yStart = frameBorder;
-                      for(int c = 0; c < SQUARES_ON_SIDE; c++)
+                      for(int r = 0; r < SQUARES_ON_SIDE; r++)
                       {
                          board[r][c] = new Square(xStart, yStart, squareLength);
                          yStart += squareLength;
@@ -154,6 +158,10 @@ public class PenteGame extends JPanel implements MouseListener
                      
                         if(ClickedSquare.getState()==EMPTY){
                             ClickedSquare.setState(whoseTurn);
+                            
+                            //NOW Check for Captures....
+                            checkForCaptures(r, c);
+                            
                             this.changeTurn();
                             this.repaint();
                         } else {
@@ -161,11 +169,66 @@ public class PenteGame extends JPanel implements MouseListener
                         }
                         
                       }
-                }  
+                }        
         }
-        
+      }
+      
+      
+      public void checkForCaptures(int row, int col){
+           checkRightHorizontal(row, col);
+           
         
       }
+      
+      public void checkRightHorizontal(int row, int col)
+      {
+        repaint();
+        // Step1 -- find out who we are looking for....
+          int lookingFor;
+          if(whoseTurn == PenteGame.RED)
+          {
+               lookingFor = PenteGame.GOLD;
+               
+          } else {
+                lookingFor = PenteGame.RED;
+             
+          }
+          
+          
+          
+          if(col <=15)
+          {
+                if(board[row][col+1].getState()==lookingFor)
+                  if(board[row][col+2].getState()==lookingFor)
+                    if(board[row][col+3].getState()==whoseTurn)
+                    {
+                          System.out.println("This should be a capture");
+                          
+                          board[row][col+1].setState(PenteGame.EMPTY);
+                          board[row][col+2].setState(PenteGame.EMPTY);
+                          repaint();
+                          
+                          if(whoseTurn == PenteGame.GOLD)
+                          {
+                            goldCaptures ++;
+                            String g = "Good Job, Gold!!! You have " + goldCaptures + " captures!";
+                            javax.swing.JOptionPane.showMessageDialog(null, g);
+                          } else {
+                            redCaptures ++;
+                            String r = "Good Job, Red!!! You have " + redCaptures + " captures!";
+                            javax.swing.JOptionPane.showMessageDialog(null, r);
+                          }
+                          
+                         
+                     
+                    }       
+          }
+       
+      }
+      
+      
+      
+      
       
       public void changeTurn(){
         whoseTurn *= -1;
