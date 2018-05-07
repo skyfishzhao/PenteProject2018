@@ -16,12 +16,12 @@ public class PenteMain
             JFrame f =  new JFrame("Play Pente All the Time");
             
             PenteGame g = new PenteGame(width, height-20, border, f);
-            f.add(g);
+            //f.add(g);
           
-            f.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-            f.setSize(width, height);
+            //f.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+            //f.setSize(width, height);
           
-            f.setVisible(true);
+            //f.setVisible(true);
 
   }
   

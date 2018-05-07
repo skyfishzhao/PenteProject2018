@@ -1,10 +1,13 @@
 package pentePac2018;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class PenteGame extends JPanel implements MouseListener 
@@ -15,7 +18,10 @@ public class PenteGame extends JPanel implements MouseListener
         public static final int RED = 1;
         public static final int GOLD = -1;
         
-        
+        //Fields to get computer playing.....
+        public String player1, player2;
+        public String whoIsRED, whoIsGOLD;
+       
         
         private int width, height;
         private Color bColor = Color.MAGENTA;
@@ -39,11 +45,78 @@ public class PenteGame extends JPanel implements MouseListener
         private Square[ ][ ] board;
   
         
+        ScorePanel scorePanel;
+       
         
+        public void setUpPlayers()
+        {
+          
+          //set up for Game
+          player1 = JOptionPane.showInputDialog(this,"What is your name?");
+          String answer = JOptionPane.showInputDialog(this,"Would you like the comptuer to play (y or n)");
+          if( answer.toLowerCase().matches("y")   ||  answer.toLowerCase().matches("yes") )
+          {
+            player2  = "Computer";
+          } else {
+            player2 = JOptionPane.showInputDialog(this,"Who is player2?");
+          }
+          
+          answer = JOptionPane.showInputDialog(this, "Is " + player1 + " going to be RED or GOLD (r or g)");
+          if( answer.toLowerCase().matches("r")   ||  answer.toLowerCase().matches("red") )
+          {
+            whoIsRED = player1;
+            scorePanel.setRedPlayerName(player1);  
+            whoIsGOLD = player2;
+            scorePanel.setGoldPlayerName(player2);
+            
+          } else {
+            whoIsRED = player2;
+            scorePanel.setRedPlayerName(player2);
+            whoIsGOLD = player1;   
+            scorePanel.setGoldPlayerName(player1);
+          }
+          
+          //not doing red gold score names
+         // scorePanel.setRedColorName("RED");
+          //scorePanel.setGoldColorName("GOLD");
+      
+          answer = JOptionPane.showInputDialog(this,"Would " + player1 + " like to go First or Second (f or s) ");
+          if( answer.toLowerCase().matches("f")   ||  answer.toLowerCase().matches("first") )
+          {
+             if(whoIsRED == player1)
+             {
+               whoseTurn = RED;
+             } else {
+               whoseTurn = GOLD;
+             }
+            
+          } else {
+            
+            if(whoIsRED == player1)
+            {
+              whoseTurn = GOLD;
+            } else {
+              whoseTurn = RED;
+            }
+                     
+          }
+          
+          scorePanel.setCurrentTurn(whoseTurn);
+          
+         
+          
+          
+        }
         
         //Constructor
         public PenteGame ( int w, int h, int b, JFrame f )
         {
+          
+          
+          
+            JPanel container = new JPanel();
+            container.setLayout(new BoxLayout(container, BoxLayout.X_AXIS));
+
               //capture info about frame and border...
               myFrame = f;
               frameBorder = b;
@@ -57,7 +130,7 @@ public class PenteGame extends JPanel implements MouseListener
               
               // Initializing the array to size 19
               board = new Square[SQUARES_ON_SIDE] [SQUARES_ON_SIDE];
-              
+
               
               //now use loops to put in the squares on the board
               //This makes 361 Squares....
@@ -66,8 +139,26 @@ public class PenteGame extends JPanel implements MouseListener
               width = (SQUARES_ON_SIDE * squareLength) + (frameBorder * 2);
               height = SQUARES_ON_SIDE * squareLength + (frameBorder * 2);
               
-              myFrame.setResizable(true);
-              myFrame.setSize(width*5, (height+20) *5);
+              int scorePanelHeight = 300;
+              scorePanel = new ScorePanel((int) width/2, height);
+              scorePanel.setMinimumSize(new Dimension((int) width/2, height));
+              scorePanel.setMaximumSize(new Dimension((int) width/2, height));
+              
+              //myFrame.setResizable(true);
+              myFrame.setSize(width + (int)( width/2 ),  height+ 20);
+              myFrame.setMinimumSize(new Dimension (width + (int)( width/2 ),  height+ 20)  );
+              myFrame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+              
+             
+              this.setMinimumSize(new Dimension(width, height));
+              this.setMaximumSize(new Dimension(width, height));
+ 
+  
+              myFrame.add(this);
+              myFrame.add(scorePanel);
+              
+              
+              
             
               myFrame.repaint();
               this.setSize(width, height);
@@ -86,19 +177,20 @@ public class PenteGame extends JPanel implements MouseListener
                          // this is to test square states
                         
                            //board[r][c].setState(this.RED);
-                        
                       }
-                      
                          xStart += squareLength;
-                
               }
               
               
+              
+              container.add(this);
+              container.add(scorePanel);
+             f.add(container);
+            
+              f.setVisible(true);
               this.addMouseListener(this);
-              
-           
-
-              
+              this.setUpPlayers();
+    
         }
         
         
@@ -170,17 +262,31 @@ public class PenteGame extends JPanel implements MouseListener
                         
                       }
                 }        
-        }
+          }
       }
       
       
       public void checkForCaptures(int row, int col){
-           checkRightHorizontal(row, col);
+           int RIGHT = 1;
+           int LEFT = -1;
+           int UP = 1;
+           int DOWN = -1;
+           checkHorizontal(row, col, RIGHT);
+           checkHorizontal(row, col, LEFT);
+           
+           checkVertical(row, col, RIGHT);
+           checkVertical(row, col, LEFT);
+           
+           checkDiagonalRight(row, col, UP);
+           checkDiagonalRight(row, col, DOWN);
+           
+           checkDiagonalLeft(row, col, UP);
+           checkDiagonalLeft(row, col, DOWN);
            
         
       }
       
-      public void checkRightHorizontal(int row, int col)
+      public void checkHorizontal(int row, int col,  int dir)
       {
         repaint();
         // Step1 -- find out who we are looking for....
@@ -194,27 +300,125 @@ public class PenteGame extends JPanel implements MouseListener
              
           }
           
-          
-          
-          if(col <=15)
+          if((dir ==1 && col <=15) || (dir == -1 && col >=3) )
           {
-                if(board[row][col+1].getState()==lookingFor)
-                  if(board[row][col+2].getState()==lookingFor)
-                    if(board[row][col+3].getState()==whoseTurn)
+                if(board[row][col+(1 * dir)].getState()==lookingFor)
+                  if(board[row][col+(2 * dir)].getState()==lookingFor)
+                    if(board[row][col+(3 * dir)].getState()==whoseTurn)
                     {
                           System.out.println("This should be a capture");
                           
-                          board[row][col+1].setState(PenteGame.EMPTY);
-                          board[row][col+2].setState(PenteGame.EMPTY);
+                          board[row][col+(1 * dir)].setState(PenteGame.EMPTY);
+                          board[row][col+(2 * dir)].setState(PenteGame.EMPTY);
                           repaint();
                           
                           if(whoseTurn == PenteGame.GOLD)
                           {
                             goldCaptures ++;
+                            scorePanel.setGoldCaptures(goldCaptures);
                             String g = "Good Job, Gold!!! You have " + goldCaptures + " captures!";
                             javax.swing.JOptionPane.showMessageDialog(null, g);
                           } else {
                             redCaptures ++;
+                            scorePanel.setRedCaptures(redCaptures);
+                            String r = "Good Job, Red!!! You have " + redCaptures + " captures!";
+                            javax.swing.JOptionPane.showMessageDialog(null, r);
+                          }
+                          
+                         
+                     
+                    }
+          }
+          
+          
+      }     
+          
+          public void checkVerticalUp(int row, int col)
+          {
+            repaint();
+            // Step1 -- find out who we are looking for....
+              int lookingFor;
+              if(whoseTurn == PenteGame.RED)
+              {
+                   lookingFor = PenteGame.GOLD;
+                   
+              } else {
+                    lookingFor = PenteGame.RED;
+                 
+              }
+              
+              if( row >=3)
+              {
+                    if(board[row + 1][col].getState()==lookingFor)
+                      if(board[row + 2][col].getState()==lookingFor)
+                        if(board[row +3][col].getState()==whoseTurn)
+                        {
+                              System.out.println("This should be a capture vert up");
+                              
+                              board[row + 1][col].setState(PenteGame.EMPTY);
+                              board[row + 2][col].setState(PenteGame.EMPTY);
+                              repaint();
+                              
+                              if(whoseTurn == PenteGame.GOLD)
+                              {
+                                goldCaptures ++;
+                                scorePanel.setGoldCaptures(goldCaptures);
+                                String g = "Good Job, Gold!!! You have " + goldCaptures + " captures!";
+                               javax.swing.JOptionPane.showMessageDialog(null, g);
+                              } else {
+                                redCaptures ++;
+                                scorePanel.setRedCaptures(redCaptures);
+                               String r = "Good Job, Red!!! You have " + redCaptures + " captures!";
+                               javax.swing.JOptionPane.showMessageDialog(null, r);
+                              }
+                              
+                             
+                  
+                        }       
+              }
+          
+          
+          
+       
+      }
+      
+          
+      
+      public void checkVertical(int row, int col,  int dir)
+      {
+        repaint();
+        // Step1 -- find out who we are looking for....
+          int lookingFor;
+          if(whoseTurn == PenteGame.RED)
+          {
+               lookingFor = PenteGame.GOLD;
+               
+          } else {
+                lookingFor = PenteGame.RED;
+             
+          }
+          
+          if((dir ==1 && row <=15 ) || (dir == -1 && row >=3) )
+          {
+                if(board[row+(1 * dir)][col].getState()==lookingFor)
+                  if(board[row+(2 * dir)][col].getState()==lookingFor)
+                    if(board[row+(3 * dir)][col].getState()==whoseTurn)
+                    {
+                          System.out.println("This should be a capture vertical");
+                          
+                          board[row+(1 * dir)][col].setState(PenteGame.EMPTY);
+                          board[row+(2 * dir)][col].setState(PenteGame.EMPTY);
+                          repaint();
+                          
+                          if(whoseTurn == PenteGame.GOLD)
+                          {
+                            goldCaptures ++;
+                            scorePanel.setGoldCaptures(goldCaptures);
+                            String g = "Good Job, Gold!!! You have " + goldCaptures + " captures!";
+                             javax.swing.JOptionPane.showMessageDialog(null, g);
+                          } else {
+                            redCaptures ++;
+                            scorePanel.setRedCaptures(redCaptures);
                             String r = "Good Job, Red!!! You have " + redCaptures + " captures!";
                             javax.swing.JOptionPane.showMessageDialog(null, r);
                           }
@@ -228,10 +432,104 @@ public class PenteGame extends JPanel implements MouseListener
       
       
       
+      public void checkDiagonalRight(int row, int col,  int dir)
+      {
+        repaint();
+        // Step1 -- find out who we are looking for....
+          int lookingFor;
+          if(whoseTurn == PenteGame.RED)
+          {
+               lookingFor = PenteGame.GOLD;
+               
+          } else {
+                lookingFor = PenteGame.RED;
+             
+          }
+          
+          if(  (dir ==1   &&  row >= 3 && col <=15 )  ||  (dir == -1   && row <=15  && col >=3)  )
+          {
+                if(board[row -(1 * dir)][col+(1 * dir)].getState()==lookingFor)
+                  if(board[row -(2 * dir)][col+(2 * dir)].getState()==lookingFor)
+                    if(board[row-(3 * dir)][col+(3 * dir)].getState()==whoseTurn)
+                    {
+                          System.out.println("This should be a capture");
+                          
+                          board[row-(1 * dir)][col+(1 * dir)].setState(PenteGame.EMPTY);
+                          board[row-(2 * dir)][col+(2 * dir)].setState(PenteGame.EMPTY);
+                          repaint();
+                          
+                          if(whoseTurn == PenteGame.GOLD)
+                          {
+                            goldCaptures ++;
+                            scorePanel.setGoldCaptures(goldCaptures);
+                            String g = "Good Job, Gold!!! You have " + goldCaptures + " captures!";
+                            javax.swing.JOptionPane.showMessageDialog(null, g);
+                          } else {
+                            redCaptures ++;
+                            scorePanel.setRedCaptures(redCaptures);
+                           String r = "Good Job, Red!!! You have " + redCaptures + " captures!";
+                            javax.swing.JOptionPane.showMessageDialog(null, r);
+                          }
+                     
+                    }       
+              }
+       
+      }
+      
+    
+      
+      public void checkDiagonalLeft(int row, int col,  int dir)
+      {
+        repaint();
+        // Step1 -- find out who we are looking for....
+          int lookingFor;
+          if(whoseTurn == PenteGame.RED)
+          {
+               lookingFor = PenteGame.GOLD;
+               
+          } else {
+                lookingFor = PenteGame.RED;
+             
+          }
+          
+          if(  (dir ==1 && col >= 3  &&  row >= 3)   || (dir == -1 && col <=15  && row <=15 ) )
+          {
+                if(board[row -(1 * dir)][col-(1 * dir)].getState()==lookingFor)
+                  if(board[row -(2 * dir)][col-(2 * dir)].getState()==lookingFor)
+                    if(board[row-(3 * dir)][col-(3 * dir)].getState()==whoseTurn)
+                    {
+                          System.out.println("This should be a capture");
+                          
+                          board[row-(1 * dir)][col-(1 * dir)].setState(PenteGame.EMPTY);
+                          board[row-(2 * dir)][col-(2 * dir)].setState(PenteGame.EMPTY);
+                          repaint();
+                          
+                          if(whoseTurn == PenteGame.GOLD)
+                          {
+                            goldCaptures ++;
+                            scorePanel.setGoldCaptures(goldCaptures);
+                            //String g = "Good Job, Gold!!! You have " + goldCaptures + " captures!";
+                            //javax.swing.JOptionPane.showMessageDialog(null, g);
+                          } else {
+                            redCaptures ++;
+                            scorePanel.setRedCaptures(redCaptures);
+                            //String r = "Good Job, Red!!! You have " + redCaptures + " captures!";
+                            //javax.swing.JOptionPane.showMessageDialog(null, r);
+                          }
+                          
+                         
+                     
+                    }       
+          }
+       
+      }
+      
+      
       
       
       public void changeTurn(){
         whoseTurn *= -1;
+        scorePanel.setCurrentTurn(whoseTurn);
       }
 
 
@@ -254,6 +552,9 @@ public class PenteGame extends JPanel implements MouseListener
         // TODO Auto-generated method stub
         
       }
+      
+      
+     
         
         
         
