@@ -2,6 +2,8 @@ package pentePac2018;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -9,8 +11,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
-public class PenteGame extends JPanel implements MouseListener 
+public class PenteGame extends JPanel implements MouseListener, ActionListener 
 {
   
         public static final int SQUARES_ON_SIDE = 19;  //literal
@@ -21,6 +24,7 @@ public class PenteGame extends JPanel implements MouseListener
         //Fields to get computer playing.....
         public String player1, player2;
         public String whoIsRED, whoIsGOLD;
+        public ComputerMoveGenerator cmg = null;
        
         
         private int width, height;
@@ -46,6 +50,12 @@ public class PenteGame extends JPanel implements MouseListener
   
         
         ScorePanel scorePanel;
+        
+        Timer computerMoveTimer;
+        Long moveMillisecondCounter = (long)0;
+        boolean computerMoveHappening = false;
+        long startComputerMove = (long) -1;
+        long computerMoveIterationWait = (long)5;
        
         
         public void setUpPlayers()
@@ -56,24 +66,29 @@ public class PenteGame extends JPanel implements MouseListener
           String answer = JOptionPane.showInputDialog(this,"Would you like the comptuer to play (y or n)");
           if( answer.toLowerCase().matches("y")   ||  answer.toLowerCase().matches("yes") )
           {
-            player2  = "Computer";
+              player2  = "Computer";
+              //Make the computer move generator here:
+              cmg = new ComputerMoveGenerator(board, this);
+              computerMoveTimer = new Timer(200, this);
+              computerMoveTimer.start();
+            
           } else {
-            player2 = JOptionPane.showInputDialog(this,"Who is player2?");
+              player2 = JOptionPane.showInputDialog(this,"Who is player2?");
           }
           
           answer = JOptionPane.showInputDialog(this, "Is " + player1 + " going to be RED or GOLD (r or g)");
           if( answer.toLowerCase().matches("r")   ||  answer.toLowerCase().matches("red") )
           {
-            whoIsRED = player1;
-            scorePanel.setRedPlayerName(player1);  
-            whoIsGOLD = player2;
-            scorePanel.setGoldPlayerName(player2);
+              whoIsRED = player1;
+              scorePanel.setRedPlayerName(player1);  
+              whoIsGOLD = player2;
+              scorePanel.setGoldPlayerName(player2);
             
           } else {
-            whoIsRED = player2;
-            scorePanel.setRedPlayerName(player2);
-            whoIsGOLD = player1;   
-            scorePanel.setGoldPlayerName(player1);
+              whoIsRED = player2;
+              scorePanel.setRedPlayerName(player2);
+              whoIsGOLD = player1;   
+              scorePanel.setGoldPlayerName(player1);
           }
           
           //not doing red gold score names
@@ -256,6 +271,13 @@ public class PenteGame extends JPanel implements MouseListener
                             
                             this.changeTurn();
                             this.repaint();
+                            
+                            if(player2.equals("Computer")){
+                              System.out.println("Computer should be playing now.");
+                              
+                              cmg.makeAComputerMove(r,c); 
+                            }
+         
                         } else {
                            javax.swing.JOptionPane.showMessageDialog(null, "YOU CAN'T CLICK HERE");
                         }
@@ -532,6 +554,10 @@ public class PenteGame extends JPanel implements MouseListener
         scorePanel.setCurrentTurn(whoseTurn);
       }
 
+      public int getWhoseTurn()
+      {
+        return whoseTurn;
+      }
 
       public void mouseReleased(MouseEvent e)
       {
@@ -552,6 +578,15 @@ public class PenteGame extends JPanel implements MouseListener
         // TODO Auto-generated method stub
         
       }
+
+      public void actionPerformed(ActionEvent e)
+      {
+        // TODO Auto-generated method stub
+        moveMillisecondCounter++;
+        if(moveMillisecondCounter > 1000000000)
+          moveMillisecondCounter = (long) 0;
+        
+      }
       
       
      
@@ -559,8 +594,5 @@ public class PenteGame extends JPanel implements MouseListener
         
         
         
-        
-        
-        
-
+       
 }
