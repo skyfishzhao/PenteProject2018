@@ -21,6 +21,13 @@ public class ComputerMoveGenerator
         //Rule2 -- stop opponent from winning (Chapin's other rule)
         // Rule 3 -- Ariah's Rule is put stone next to last move
         //Rule [last] -- Make Random Move (low priority)
+    
+        //busy loop to simulate thinking...
+//        for(int w= 0; w < 100000; ++w)
+//        {
+//          System.out.println("computer is thinking...");
+//        }
+    
         
         boolean didMove = makeAriahMove();
         if(didMove == false) 
@@ -32,6 +39,9 @@ public class ComputerMoveGenerator
   
   public boolean makeAriahMove(){
     boolean didIDoMove = false;
+    
+      // *************Write your code right here ****************
+    
     
     return didIDoMove;
   }
@@ -72,6 +82,17 @@ public class ComputerMoveGenerator
     
   }
   
+  public void makeAFirstMove(){
+    
+          if(myGame.getWhoseTurn()== PenteGame.RED ){
+            board[19/2][19/2].setState(PenteGame.RED);
+          } else {
+            board[19/2][19/2].setState(PenteGame.GOLD);
+          }
+          myGame.changeTurn();
+          myGame.repaint();
+    
+  }
   
 
 }

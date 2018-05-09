@@ -3,7 +3,6 @@ package pentePac2018;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -11,9 +10,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.Timer;
 
-public class PenteGame extends JPanel implements MouseListener, ActionListener 
+public class PenteGame extends JPanel implements MouseListener
 {
   
         public static final int SQUARES_ON_SIDE = 19;  //literal
@@ -39,25 +37,12 @@ public class PenteGame extends JPanel implements MouseListener, ActionListener
         private int redCaptures = 0;
         private int goldCaptures = 0;
         
-        // make and instance -- instantiate
-       
-        //Declaration...
-        //private Square testSquare;
-        //private Square[ ][testRow;
-        
         // We make an array to hold all the board Squares
         private Square[ ][ ] board;
   
-        
         ScorePanel scorePanel;
-        
-        Timer computerMoveTimer;
-        Long moveMillisecondCounter = (long)0;
-        boolean computerMoveHappening = false;
-        long startComputerMove = (long) -1;
-        long computerMoveIterationWait = (long)5;
        
-        
+        //This is called by the constructor to get setup information
         public void setUpPlayers()
         {
           
@@ -69,8 +54,7 @@ public class PenteGame extends JPanel implements MouseListener, ActionListener
               player2  = "Computer";
               //Make the computer move generator here:
               cmg = new ComputerMoveGenerator(board, this);
-              computerMoveTimer = new Timer(200, this);
-              computerMoveTimer.start();
+           
             
           } else {
               player2 = JOptionPane.showInputDialog(this,"Who is player2?");
@@ -91,9 +75,7 @@ public class PenteGame extends JPanel implements MouseListener, ActionListener
               scorePanel.setGoldPlayerName(player1);
           }
           
-          //not doing red gold score names
-         // scorePanel.setRedColorName("RED");
-          //scorePanel.setGoldColorName("GOLD");
+      
       
           answer = JOptionPane.showInputDialog(this,"Would " + player1 + " like to go First or Second (f or s) ");
           if( answer.toLowerCase().matches("f")   ||  answer.toLowerCase().matches("first") )
@@ -118,6 +100,20 @@ public class PenteGame extends JPanel implements MouseListener, ActionListener
           
           scorePanel.setCurrentTurn(whoseTurn);
           
+          //allow for computer to generate move on first turn
+          if(
+              (whoseTurn == GOLD && whoIsGOLD == "Computer")
+              ||
+              (whoseTurn == RED && whoIsRED == "Computer")
+              ) {
+            
+          
+              
+                  
+                  cmg.makeAFirstMove(); 
+                  scorePanel.setCurrentTurn(whoseTurn);
+          }
+          
          
           
           
@@ -126,8 +122,6 @@ public class PenteGame extends JPanel implements MouseListener, ActionListener
         //Constructor
         public PenteGame ( int w, int h, int b, JFrame f )
         {
-          
-          
           
             JPanel container = new JPanel();
             container.setLayout(new BoxLayout(container, BoxLayout.X_AXIS));
@@ -139,14 +133,12 @@ public class PenteGame extends JPanel implements MouseListener, ActionListener
               width = w;
               height = h;
               
-             // this.setSize(width, height);
               
               //Making the object....
               
               // Initializing the array to size 19
               board = new Square[SQUARES_ON_SIDE] [SQUARES_ON_SIDE];
 
-              
               //now use loops to put in the squares on the board
               //This makes 361 Squares....
               int squareLength = (int)(Math.round(width/ this.SQUARES_ON_SIDE));
@@ -171,9 +163,6 @@ public class PenteGame extends JPanel implements MouseListener, ActionListener
   
               myFrame.add(this);
               myFrame.add(scorePanel);
-              
-              
-              
             
               myFrame.repaint();
               this.setSize(width, height);
@@ -252,7 +241,7 @@ public class PenteGame extends JPanel implements MouseListener, ActionListener
         
       }
       
-      public void checkClick(int mouseX, int mouseY){
+      public  void checkClick(int mouseX, int mouseY){
         Square ClickedSquare;   //temporary square that holds a link to where you clicked
         for(int r = 0; r < SQUARES_ON_SIDE; r++)
         {
@@ -271,11 +260,34 @@ public class PenteGame extends JPanel implements MouseListener, ActionListener
                             
                             this.changeTurn();
                             this.repaint();
+                            scorePanel.setCurrentTurn(whoseTurn);
+                            this.paintImmediately(0, 0, width, height);
+                           
+     
+                            
                             
                             if(player2.equals("Computer")){
-                              System.out.println("Computer should be playing now.");
+                              //System.out.println("Computer should be playing now.");
+                              //computerMoveStartTime = moveMillisecondCounter;
+                              if(
+                                  (whoseTurn == GOLD && whoIsGOLD == "Computer")
+                                  ||
+                                  (whoseTurn == RED && whoIsRED == "Computer")
+                                  ) {
+                                
                               
-                              cmg.makeAComputerMove(r,c); 
+                                      try
+                                      {
+                                           Thread.sleep(1500); // sleep for 1500 milliseconds
+                                      }
+                                      catch (Exception e)
+                                      {
+                                           e.printStackTrace();
+                                      }
+                                      
+                                      cmg.makeAComputerMove(r,c); 
+                                      scorePanel.setCurrentTurn(whoseTurn);
+                              }
                             }
          
                         } else {
@@ -286,6 +298,8 @@ public class PenteGame extends JPanel implements MouseListener, ActionListener
                 }        
           }
       }
+      
+     
       
       
       public void checkForCaptures(int row, int col){
@@ -579,12 +593,13 @@ public class PenteGame extends JPanel implements MouseListener, ActionListener
         
       }
 
-      public void actionPerformed(ActionEvent e)
+      public synchronized void actionPerformed(ActionEvent e)
       {
         // TODO Auto-generated method stub
-        moveMillisecondCounter++;
-        if(moveMillisecondCounter > 1000000000)
-          moveMillisecondCounter = (long) 0;
+//        moveMillisecondCounter++;
+//        System.out.println("Timer Counter is at " + moveMillisecondCounter);
+//        if(moveMillisecondCounter > 1000000000)
+//          moveMillisecondCounter = (long) 0;
         
       }
       

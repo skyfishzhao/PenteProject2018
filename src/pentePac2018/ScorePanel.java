@@ -371,6 +371,7 @@ goldPlayerInfo.add(GPNameInfo);
                   }
         
                   this.repaint();
+                  this.paintImmediately(0, 0, width, height);
       }
       
 }
