@@ -22,10 +22,10 @@ public class Square
       private Color goldDarkStoneColor = new Color(165, 160, 33);
       private Color goldLightStoneColor = new Color(249, 222, 14);
       
-      
-      
       private Color stoneShadowColor = new Color(132, 132, 116);
       
+      private int nextMovePriority = -1;  //all priorities would positive.
+      private int moveOorD = 0;   // Zero is neither
       
       public Square(int x, int y, int len) 
       {
@@ -39,12 +39,18 @@ public class Square
       
       public void drawMe(Graphics g)
       {
+        
+        
+            
             //Set Background
             g.setColor(bColor);
             //Draw background Square
             g.fillRect(xLoc, yLoc, sideLength, sideLength);
             
           
+            //for drawing Available moves
+            drawAvailableMoves(g);
+            
             //if there is a stone draw a shadow
             if(squareState!= PenteGame.EMPTY)
             {
@@ -125,9 +131,34 @@ public class Square
                       );
             }
             
-            
-            
-        
+
+      }
+      
+      
+      public void drawAvailableMoves(Graphics g)
+      {
+                if(this.nextMovePriority > -1)
+                {
+                  
+                  if(moveOorD == ComputerMoveGenerator.OFFENSE)
+                  {
+                        g.setColor(Color.GREEN);
+                        
+                  } else {
+                    
+                        g.setColor(Color.BLUE);
+                  }
+                  
+                  g.drawOval (
+                      xLoc + (int)(sideLength * 0.1),
+                      yLoc + (int)(sideLength * 0.1),
+                      (int)(sideLength * 0.8),
+                      (int)(sideLength * 0.8 )
+                      );
+                  String s = "NMP= " + nextMovePriority;
+                  g.drawString(s, xLoc+ (int)(sideLength * 0.3), (int)(sideLength * 0.3));
+                  
+                }
       }
       
       
@@ -154,6 +185,24 @@ public class Square
           
           
           return gotClicked;
+      }
+      
+     //accessor methods. 
+      public void setNextMovePriority(int newP, int OorD)
+      {
+            nextMovePriority = newP;
+            moveOorD = OorD;
+      }
+      
+      
+      public int getNextMovePriority()
+      {
+            return nextMovePriority;
+      }
+      
+      public void resetNextMovePriority()
+      {
+            nextMovePriority = -1;
       }
       
       

@@ -18,6 +18,7 @@ public class PenteGame extends JPanel implements MouseListener
         public static final int EMPTY = 0;
         public static final int RED = 1;
         public static final int GOLD = -1;
+        public static final int EDGE = 2;
         
         //Fields to get computer playing.....
         public String player1, player2;
@@ -571,6 +572,14 @@ public class PenteGame extends JPanel implements MouseListener
       public int getWhoseTurn()
       {
         return whoseTurn;
+      }
+      
+      public String getWhoIsRed(){
+        return whoIsRED;
+      }
+      
+      public String getWhoIsGold(){
+        return whoIsGOLD;
       }
 
       public void mouseReleased(MouseEvent e)
