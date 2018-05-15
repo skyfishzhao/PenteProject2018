@@ -174,6 +174,15 @@ public class ComputerMoveGenerator
                
            findHorizontalGroups( whichColor, this.OFFENSE);   
            findHorizontalGroups( whichColor * -1 , this.DEFENSE);   
+           
+           findVerticalGroups( whichColor, this.OFFENSE);   
+           findVerticalGroups( whichColor * -1 , this.DEFENSE);   
+           
+           findDiagonalGroups1(whichColor, this.OFFENSE);
+           findDiagonalGroups1(whichColor * -1, this.DEFENSE);
+           
+           findDiagonalGroups2(whichColor, this.OFFENSE);
+           findDiagonalGroups2(whichColor * -1, this.DEFENSE);
             
             System.out.println("At the end of findStoneGroups --here is what is on the Offense List");
             System.out.println(offenseMoveList);
@@ -189,7 +198,7 @@ public class ComputerMoveGenerator
             {
                     for(int c = 0; c < 19; c++)
                     {
-                            board[r][c].resetNextMovePriority();
+                            board[r][c].resetNextMovePriorities();
                       
                     }
               
@@ -280,6 +289,434 @@ public class ComputerMoveGenerator
         }
         
         
+        
+        //************* NEW CODE TO LOOK FOR VERTICAL MOVES
+        
+        public void findVerticalGroups( int whichColor, int OorD )
+        {    
+              for(int col = 0; col < 19; col++)
+              {
+                    //look for stone combinations
+                    boolean done = false;
+                    int row = 0;
+                    
+                    while(!done && row < 19)
+                    {
+                            if( board[row][col].getState()==whichColor )
+                            {
+                                 int stoneGroupLength = 1;
+                                 row++;
+                                 while( row < 19 && board[row][col].getState()==whichColor )
+                                 {
+                                         stoneGroupLength++;
+                                         row++;
+                                 }
+                                 
+                                 int end1 = 0, end2 = 0;
+                                 int priorityRanking = stoneGroupLength;
+                                 
+                                  //we will do edge2 first:
+                                  if(row < 19)
+                                  {
+                                      end2 = board[row][col].getState();
+                                   } else {
+                                       end2 = PenteGame.EDGE;
+                                    }
+                               
+                                   //now we do end1
+                                   if( (row - stoneGroupLength - 1 ) >= 0 )
+                                   {
+                                       end1 = board[row - stoneGroupLength - 1][col ].getState();
+                                 } else {
+                                       end1 = PenteGame.EDGE;
+                                 }
+                               
+    
+                                       //Now Evaluate the move
+                               
+                                       if(end1 == PenteGame.GOLD)
+                                       {
+                                                       if( end2 == PenteGame.EMPTY)
+                                                       {
+                                                            priorityRanking += stoneGroupLength +1;
+                                                            placeStoneOnList(row, col , priorityRanking, OorD);
+                                                       }
+                                         
+                                       } else if ( end1 == PenteGame.EMPTY){
+                                                         priorityRanking += stoneGroupLength +1;
+                                                         placeStoneOnList(row  - stoneGroupLength - 1, col, priorityRanking, OorD);
+                                             
+                                                           if(end2 == PenteGame.EMPTY)
+                                                           {
+                                                             priorityRanking += stoneGroupLength +1;
+                                                             placeStoneOnList(row, col, priorityRanking, OorD);  
+                                                           }
+                                             
+                                       } else {
+                                         
+                                                       if(end2 == PenteGame.EMPTY)
+                                                       {
+                                                         priorityRanking += stoneGroupLength +1;
+                                                         placeStoneOnList(row, col, priorityRanking, OorD);     
+                                                       }
+                                       }
+                           
+                            } else {
+                              row++;
+                            }
+                    }
+              }
+          
+            myGame.repaint();
+        }
+        
+        //********* NEW CODE for FINDING DIAGONAL MOVES 
+        
+        public void findDiagonalGroups1( int whichColor, int OorD )
+        {    
+           
+          for (int i = 0;  i < 19; i++)
+          {
+                    //look for stone combinations
+                    boolean done = false;
+                    int col = i;
+                    int row = 0;
+                    
+                    while(!done && (col < 19 && row < 19 ))
+                    {
+                            if( board[row][col].getState()==whichColor )
+                            {
+                                 int stoneGroupLength = 1;
+                                 col++;
+                                 row++;
+                                 while( (col < 19 && row < 19  ) && board[row][col].getState()==whichColor )
+                                 {
+                                         stoneGroupLength++;
+                                         col++;
+                                         row++;
+                                 }
+                                 
+                                 int end1 = 0, end2 = 0;
+                                 int priorityRanking = stoneGroupLength;
+                                 
+                                  //we will do edge2 first:
+                                  if(col < 19  && row < 19 )
+                                  {
+                                      end2 = board[row][col].getState();
+                                   } else {
+                                       end2 = PenteGame.EDGE;
+                                    }
+                               
+                                   //now we do end1
+                                   if( (col - stoneGroupLength - 1 ) >= 0 && (row - stoneGroupLength - 1 ) >= 0  )
+                                   {
+                                       end1 = board[row - stoneGroupLength - 1 ][col - stoneGroupLength - 1].getState();
+                                 } else {
+                                       end1 = PenteGame.EDGE;
+                                 }
+                               
+    
+                                       //Now Evaluate the move
+                               
+                                       if(end1 == PenteGame.GOLD)
+                                       {
+                                                       if( end2 == PenteGame.EMPTY)
+                                                       {
+                                                            priorityRanking += stoneGroupLength +1;
+                                                            placeStoneOnList(row, col , priorityRanking, OorD);
+                                                       }
+                                         
+                                       } else if ( end1 == PenteGame.EMPTY){
+                                                         priorityRanking += stoneGroupLength +1;
+                                                         placeStoneOnList(row - stoneGroupLength - 1, col - stoneGroupLength - 1, priorityRanking, OorD);
+                                             
+                                                           if(end2 == PenteGame.EMPTY)
+                                                           {
+                                                             priorityRanking += stoneGroupLength +1;
+                                                             placeStoneOnList(row, col, priorityRanking, OorD);  
+                                                           }
+                                             
+                                       } else {
+                                         
+                                                       if(end2 == PenteGame.EMPTY)
+                                                       {
+                                                         priorityRanking += stoneGroupLength +1;
+                                                         placeStoneOnList(row, col, priorityRanking, OorD);     
+                                                       }
+                                       }
+                           
+                            } else {
+                              col++;
+                              row++;
+                            }
+                    
+                    }
+              
+          }
+          
+          
+          
+          for (int i = 18;  i >=0; i--)
+          {
+                    //look for stone combinations
+                    boolean done = false;
+                    int col = 0;
+                    int row = i;
+                    
+                    while(!done && (col < 19 && row < 19 ))
+                    {
+                            if( board[row][col].getState()==whichColor )
+                            {
+                                 int stoneGroupLength = 1;
+                                 col++;
+                                 row++;
+                                 while( (col < 19 && row < 19  ) && board[row][col].getState()==whichColor )
+                                 {
+                                         stoneGroupLength++;
+                                         col++;
+                                         row++;
+                                 }
+                                 
+                                 int end1 = 0, end2 = 0;
+                                 int priorityRanking = stoneGroupLength;
+                                 
+                                  //we will do edge2 first:
+                                  if(col < 19  && row < 19 )
+                                  {
+                                      end2 = board[row][col].getState();
+                                   } else {
+                                       end2 = PenteGame.EDGE;
+                                    }
+                               
+                                   //now we do end1
+                                   if( (col - stoneGroupLength - 1 ) >= 0 && (row - stoneGroupLength - 1 ) >= 0  )
+                                   {
+                                       end1 = board[row - stoneGroupLength - 1 ][col - stoneGroupLength - 1].getState();
+                                 } else {
+                                       end1 = PenteGame.EDGE;
+                                 }
+                               
+    
+                                       //Now Evaluate the move
+                               
+                                       if(end1 == PenteGame.GOLD)
+                                       {
+                                                       if( end2 == PenteGame.EMPTY)
+                                                       {
+                                                            priorityRanking += stoneGroupLength +1;
+                                                            placeStoneOnList(row, col , priorityRanking, OorD);
+                                                       }
+                                         
+                                       } else if ( end1 == PenteGame.EMPTY){
+                                                         priorityRanking += stoneGroupLength +1;
+                                                         placeStoneOnList(row - stoneGroupLength - 1, col - stoneGroupLength - 1, priorityRanking, OorD);
+                                             
+                                                           if(end2 == PenteGame.EMPTY)
+                                                           {
+                                                             priorityRanking += stoneGroupLength +1;
+                                                             placeStoneOnList(row, col, priorityRanking, OorD);  
+                                                           }
+                                             
+                                       } else {
+                                         
+                                                       if(end2 == PenteGame.EMPTY)
+                                                       {
+                                                         priorityRanking += stoneGroupLength +1;
+                                                         placeStoneOnList(row, col, priorityRanking, OorD);     
+                                                       }
+                                       }
+                           
+                            } else {
+                              col++;
+                              row++;
+                            }
+                    
+                    }
+              
+          }
+            myGame.repaint();
+        }
+        
+        
+        
+ //********* NEW CODE for FINDING DIAGONAL MOVES 
+        
+        public void findDiagonalGroups2( int whichColor, int OorD )
+        {    
+           
+          for (int i = 18;  i >= 0;  i-- )
+          {
+                    //look for stone combinations
+                    boolean done = false;
+                    int col = i;
+                    int row = 0;
+                    
+                    while(!done && (col >= 0 && row < 19 ))
+                    {
+                            if( board[row][col].getState()==whichColor )
+                            {
+                                 int stoneGroupLength = 1;
+                                 col--;
+                                 row++;
+                                 while( (col >=0 && row < 19  ) && board[row][col].getState()==whichColor )
+                                 {
+                                         stoneGroupLength++;
+                                         col--;
+                                         row++;
+                                 }
+                                 
+                                 int end1 = 0, end2 = 0;
+                                 int priorityRanking = stoneGroupLength;
+                                 
+                                  //we will do edge2 first:
+                                  if(col >= 0  && row < 19 )
+                                  {
+                                      end2 = board[row][col].getState();
+                                   } else {
+                                       end2 = PenteGame.EDGE;
+                                    }
+                               
+                                   //now we do end1
+                                   if( (col + stoneGroupLength + 1 ) < 19 && (row - stoneGroupLength - 1 ) >= 0  )
+                                   {
+                                       end1 = board[row - stoneGroupLength - 1 ][col + stoneGroupLength + 1].getState();
+                                 } else {
+                                       end1 = PenteGame.EDGE;
+                                 }
+                               
+    
+                                       //Now Evaluate the move
+                               
+                                       if(end1 == PenteGame.GOLD)
+                                       {
+                                                       if( end2 == PenteGame.EMPTY)
+                                                       {
+                                                            priorityRanking += stoneGroupLength +1;
+                                                            placeStoneOnList(row, col , priorityRanking, OorD);
+                                                       }
+                                         
+                                       } else if ( end1 == PenteGame.EMPTY){
+                                                         priorityRanking += stoneGroupLength +1;
+                                                         placeStoneOnList(row - stoneGroupLength - 1, col + stoneGroupLength + 1, priorityRanking, OorD);
+                                             
+                                                           if(end2 == PenteGame.EMPTY)
+                                                           {
+                                                             priorityRanking += stoneGroupLength +1;
+                                                             placeStoneOnList(row, col, priorityRanking, OorD);  
+                                                           }
+                                             
+                                       } else {
+                                         
+                                                       if(end2 == PenteGame.EMPTY)
+                                                       {
+                                                         priorityRanking += stoneGroupLength +1;
+                                                         placeStoneOnList(row, col, priorityRanking, OorD);     
+                                                       }
+                                       }
+                           
+                            } else {
+                              col--;
+                              row++;
+                            }
+                    
+                    }
+              
+          }
+          
+        
+          
+          for (int i = 1;  i < 19;  i++ )
+          {
+                    //look for stone combinations
+                    boolean done = false;
+                    int col = 18;
+                    int row = i;
+                    
+                    while(!done && (col >= 0 && row < 19 ))
+                    {
+                            if( board[row][col].getState()==whichColor )
+                            {
+                                 int stoneGroupLength = 1;
+                                 col--;
+                                 row++;
+                                 while( (col >= 0 && row < 19  ) && board[row][col].getState()==whichColor )
+                                 {
+                                         stoneGroupLength++;
+                                         col--;
+                                         row++;
+                                 }
+                                 
+                                 int end1 = 0, end2 = 0;
+                                 int priorityRanking = stoneGroupLength;
+                                 
+                                  //we will do edge2 first:
+                                  if(col >= 0  && row < 19 )
+                                  {
+                                      end2 = board[row][col].getState();
+                                   } else {
+                                       end2 = PenteGame.EDGE;
+                                    }
+                               
+                                   //now we do end1
+                                   if( (col + stoneGroupLength + 1 ) < 19  && (row - stoneGroupLength - 1 ) >= 0  )
+                                   {
+                                       end1 = board[row - stoneGroupLength - 1 ][col + stoneGroupLength + 1].getState();
+                                 } else {
+                                       end1 = PenteGame.EDGE;
+                                 }
+                               
+    
+                                       //Now Evaluate the move
+                               
+                                       if(end1 == PenteGame.GOLD)
+                                       {
+                                                       if( end2 == PenteGame.EMPTY)
+                                                       {
+                                                            priorityRanking += stoneGroupLength +1;
+                                                            placeStoneOnList(row, col , priorityRanking, OorD);
+                                                       }
+                                         
+                                       } else if ( end1 == PenteGame.EMPTY){
+                                                         priorityRanking += stoneGroupLength +1;
+                                                         placeStoneOnList(row - stoneGroupLength - 1, col + stoneGroupLength + 1, priorityRanking, OorD);
+                                             
+                                                           if(end2 == PenteGame.EMPTY)
+                                                           {
+                                                             priorityRanking += stoneGroupLength +1;
+                                                             placeStoneOnList(row, col, priorityRanking, OorD);  
+                                                           }
+                                             
+                                       } else {
+                                         
+                                                       if(end2 == PenteGame.EMPTY)
+                                                       {
+                                                         priorityRanking += stoneGroupLength +1;
+                                                         placeStoneOnList(row, col, priorityRanking, OorD);     
+                                                       }
+                                       }
+                           
+                            } else {
+                              col--;
+                              row++;
+                            }
+                    
+                    }
+              
+          }
+          
+            myGame.repaint();
+        }
+                
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         //**************  THIS IS NEW CODE TO ADD A POTENTIAL MOVE TO EITHER AN OFFENSE OR DEFENSE LIST
         
         public void placeStoneOnList(int r, int c, int p, int OorD)
@@ -298,100 +735,5 @@ public class ComputerMoveGenerator
           
         }
         
-        
-        
-        
-  
-  /*   NOT IN USE
-         public void findStoneGroups2(int whichColor)
-         {
-                   redGroupList = new ArrayList<StoneGroup>();
-                   goldGroupList = new ArrayList<StoneGroup>();
-           
-                   for(int r = 0; r< 19; r++)
-                   {
-                       if(whichColor == PenteGame.RED)
-                       {
-                             processHorizontalRow( r, whichColor, redGroupList );
-                       } else {
-                         
-                             processHorizontalRow( r, whichColor, goldGroupList );                       
-                       }
-                       
-                   }
-           
-           
-         }
-         
-         */
-        
-        /* NOT IN USE
-            
-         public void processHorizontalRow(int whichRow, int whichColor, ArrayList<StoneGroup> whichList)
-         {
-           
-                int col = 0;
-                while(col < 19)
-                {
-                      if(  board[whichRow][col].getState()== whichColor )
-                      {
-                            ArrayList<Square> group = new ArrayList<Square>();
-                            Square leftOne, rightOne;
-                             group.add(  board[whichRow][col]  );
-                             
-                              if(col -1 < 0) {
-                                    leftOne  = null;
-                             } else {
-                                 leftOne = board[whichRow][col-1] ;
-                             }
-              
-                            col++;
-                           boolean  done = false;
-                            while(!done && col < 19)
-                            {
-                                  if(  board[whichRow][col].getState()== whichColor )
-                                  {
-                                    group.add(  board[whichRow][col]  );
-                                    col++;
-                                  } else {
-                                    done = true;
-                                  }
-                                  
-                                  if(col >= 19)
-                                  {
-                                    done = true;
-                                  }
-                                  
-                            }
-                            
-                          StoneGroup s = new StoneGroup( group, whichColor );
-                          s.setLeftEnd(leftOne);
-                          if(col +1 >= 19) {
-                              rightOne  = null;
-                          } else {
-                              rightOne = board[whichRow][col+1] ;
-                          }
-                          s.setRightEnd(rightOne);
-                          s.generateRanking();
-                          if(whichColor == PenteGame.RED)
-                          {
-                                redGroupList.add(s);
-                          } else {
-                                goldGroupList.add(s);
-                          }
-                         
-                        
-                      } else {
-                            col++;
-                      }
-                  
-                  
-                }
-           
-           
-           
-         }
-    
-*/
 
 }

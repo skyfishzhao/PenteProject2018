@@ -24,8 +24,10 @@ public class Square
       
       private Color stoneShadowColor = new Color(132, 132, 116);
       
-      private int nextMovePriority = -1;  //all priorities would positive.
-      private int moveOorD = 0;   // Zero is neither
+      private int nextMoveOPriority = -1;  //all priorities would positive.
+      private int nextMoveDPriority = -1;  //all priorities would positive.
+      private int moveForOffense = 0;   // either 0 or 1
+      private int moveForDefense = 0;  // either 0 or -1
       
       public Square(int x, int y, int len) 
       {
@@ -39,15 +41,12 @@ public class Square
       
       public void drawMe(Graphics g)
       {
-        
-        
             
             //Set Background
             g.setColor(bColor);
             //Draw background Square
             g.fillRect(xLoc, yLoc, sideLength, sideLength);
             
-          
             //for drawing Available moves
             drawAvailableMoves(g);
             
@@ -137,28 +136,39 @@ public class Square
       
       public void drawAvailableMoves(Graphics g)
       {
-                if(this.nextMovePriority > -1)
-                {
+    
                   
-                  if(moveOorD == ComputerMoveGenerator.OFFENSE)
+                  if(moveForOffense == ComputerMoveGenerator.OFFENSE)
                   {
                         g.setColor(Color.GREEN);
                         
-                  } else {
-                    
-                        g.setColor(Color.BLUE);
+                        g.drawOval (
+                            xLoc + (int)(sideLength * 0.1) + 3,
+                            yLoc + (int)(sideLength * 0.1) + 3,
+                            (int)(sideLength * 0.8) - 6,
+                            (int)(sideLength * 0.8 ) - 6
+                            );
+                        
                   }
                   
-                  g.drawOval (
-                      xLoc + (int)(sideLength * 0.1),
-                      yLoc + (int)(sideLength * 0.1),
-                      (int)(sideLength * 0.8),
-                      (int)(sideLength * 0.8 )
-                      );
-                  String s = "NMP= " + nextMovePriority;
-                  g.drawString(s, xLoc+ (int)(sideLength * 0.3), (int)(sideLength * 0.3));
+                  if(moveForDefense == ComputerMoveGenerator.DEFENSE)
+                  {
+                    
+                        g.setColor(Color.BLUE);
+                        
+                        g.drawOval (
+                            xLoc + (int)(sideLength * 0.1) ,
+                            yLoc + (int)(sideLength * 0.1) ,
+                            (int)(sideLength * 0.8) ,
+                            (int)(sideLength * 0.8 ) 
+                            );
+                  }
                   
-                }
+                 
+                 // String s = "NMP= " + nextMovePriority;
+                 // g.drawString(s, xLoc+ (int)(sideLength * 0.3), (int)(sideLength * 0.3));
+                  
+                
       }
       
       
@@ -190,19 +200,35 @@ public class Square
      //accessor methods. 
       public void setNextMovePriority(int newP, int OorD)
       {
-            nextMovePriority = newP;
-            moveOorD = OorD;
+        
+              if(OorD == ComputerMoveGenerator.DEFENSE){
+                  nextMoveDPriority = newP;
+                  moveForDefense = OorD;
+              }
+              
+              if(OorD == ComputerMoveGenerator.OFFENSE){
+                nextMoveOPriority = newP;
+                moveForOffense = OorD;
+            }
       }
       
       
-      public int getNextMovePriority()
+      public int getNextMoveDPriority()
       {
-            return nextMovePriority;
+            return nextMoveDPriority;
       }
       
-      public void resetNextMovePriority()
+      public int getNextMoveOPriority()
       {
-            nextMovePriority = -1;
+            return nextMoveOPriority;
+      }
+      
+      public void resetNextMovePriorities()
+      {
+            nextMoveOPriority = -1;
+            nextMoveDPriority = -1;
+            moveForOffense = 0;   // either 0 or 1
+            moveForDefense = 0;  // either 0 or -1
       }
       
       
